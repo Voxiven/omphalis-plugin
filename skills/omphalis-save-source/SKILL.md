@@ -42,7 +42,9 @@ in with their own Omphalis account.
    Higher levels use more of the user's monthly comprehension units. Never pick
    `full` on the user's behalf just because it does more.
 
-3. **Read the result.**
+3. **Read the result.** Every response carries the item `id`, a `status` and
+   the `depth` the save was processed at. When `depth` was left out, that is
+   the user's Library default, which can be `full`.
    - `status: "processing"`: saved. A link's readable content is extracted in
      the background and becomes readable a little later. Tell the user it is
      saved and give them the item id.
@@ -55,7 +57,9 @@ in with their own Omphalis account.
 4. **Organize only if asked.** If the user asked for a tag, Collection or
    Space, look up existing names first with `tags_list`, `collections_list` or
    `spaces_list` and reuse a match, then call `library_organize` with the item
-   id. Everything `library_organize` does can be undone in Omphalis.
+   id. A saved link or note is not placed in any Space on its own, so file it
+   with `library_organize` when the user wants it in one. Everything
+   `library_organize` does can be undone in Omphalis.
 
 5. **Confirm briefly.** Say what was saved, at which level, and where it was
    filed. Do not summarize the source in place of the user reading it unless

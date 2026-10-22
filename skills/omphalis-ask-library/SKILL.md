@@ -23,19 +23,28 @@ call opens an Omphalis sign-in and consent screen in the browser.
 | `library_get` | `library:read` | Read one item's content, in windows of up to 50,000 characters |
 | `marks_get` | `marks:read` | Read the Marks on an item, including the user's own notes |
 | `library_ask` | `library:synthesize` | Answer a question across items, with citations to the source items |
+| `notebooks_list` | `notebooks:read` | Find a notebook the user names, before appending to it |
 | `notebooks_create`, `notebooks_append` | `notebooks:write` | Keep an answer in a notebook, only when the user asks |
 
 ## Steps
 
-1. **Find the right sources.** Call `search_library` with the user's terms. If
-   they named a Space, a tag or a kind of source ("my podcasts"), narrow with
-   `space_id`, or use `library_list` with `content_type` or `tag`. Note the
+1. **Find the right sources.** Call `search_library` with short, distinctive
+   terms (a title word, a name). Long multi-word queries can return unrelated
+   items, and every result may show the same `relevance`, so check titles and
+   snippets rather than trusting the order. If the user named a Space, a tag or
+   a kind of source ("my podcasts"), narrow with `space_id`, or use
+   `library_list` with `content_type` (`article`, `pdf`, `video`, `podcast`,
+   `voice_note`, `notebook`, or `snippet` for saved notes) or `tag`. Note the
    item ids that matter.
 
 2. **Answer.**
    - For a question across several sources, call `library_ask` with the
      `question`, and pass `item_ids` (or `space_id`) when step 1 found the
      relevant items. Keep its citations with the answer.
+   - `library_ask` can come back without an answer: `answer: null`,
+     `citations: []` and a `reason` such as `not_enough_library_content`. That
+     is not an error to retry. Read the items from step 1 with `library_get`
+     and answer from what you read, citing each item by title.
    - For a question about one item, or to quote a passage exactly, read it with
      `library_get`. Long items come back in windows: check
      `content_truncated` and `content_total_length`, and page with `offset`
