@@ -1,4 +1,6 @@
-# Omphalis plugin
+# Omphalis
+
+Omphalis MCP server and plugin: connect your Omphalis Library to Grok, Cursor, Claude, ChatGPT and any MCP client.
 
 Omphalis is a workspace for understanding articles, PDFs, videos and podcasts.
 Bring sources together, work through difficult passages, ask questions across
@@ -15,16 +17,98 @@ Omphalis MCP server, and adds two skills:
 Works with Grok Build (`.grok-plugin/plugin.json`, `.mcp.json`), Cursor
 (`.cursor-plugin/plugin.json`, `mcp.json`) and Grok Bot.
 
-## Setup
+- Product: https://omphalis.ai
+- Agent connection: https://omphalis.ai/auth.md
+- Plans: https://omphalis.ai/pricing
 
-1. Install the plugin.
-2. The first time the agent uses Omphalis, your browser opens the Omphalis
-   sign-in and consent screen. Sign in with your Omphalis account and approve
-   the permissions you want to give.
-3. That's it. There is no API key to paste.
+## Install
+
+The server is remote Streamable HTTP. The endpoint is
+`https://app.omphalis.ai/api/v2/mcp`. The first call opens the Omphalis
+sign-in and consent screen. Sign in with your Omphalis account and approve
+the permissions you want to give. There is no API key to paste.
 
 You need an Omphalis account. There's a free plan; sign up at
 https://app.omphalis.ai/signup.
+
+### Grok Build
+
+From a shell, with [Grok Build](https://x.ai/news/grok-plugin-marketplace):
+
+```bash
+grok plugin install Voxiven/omphalis-plugin --trust
+```
+
+`--trust` is required for Grok to attach the plugin's MCP server. The plugin
+root is this repository: `.grok-plugin/plugin.json` and `.mcp.json`.
+
+### Cursor
+
+[![Add to Cursor](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=omphalis&config=eyJ1cmwiOiJodHRwczovL2FwcC5vbXBoYWxpcy5haS9hcGkvdjIvbWNwIn0=)
+
+That deeplink installs the remote server `omphalis` with
+`{"url":"https://app.omphalis.ai/api/v2/mcp"}`, the same entry as [`mcp.json`](mcp.json).
+The `cursor://` form is
+`cursor://anysphere.cursor-deeplink/mcp/install?name=omphalis&config=eyJ1cmwiOiJodHRwczovL2FwcC5vbXBoYWxpcy5haS9hcGkvdjIvbWNwIn0=`.
+
+Cursor connection to this endpoint depends on [Voxiven/Omphalis#4915](https://github.com/Voxiven/Omphalis/issues/4915).
+
+### Claude Desktop and Claude Code
+
+Claude Code:
+
+```bash
+claude mcp add --transport http omphalis https://app.omphalis.ai/api/v2/mcp
+```
+
+In Claude Desktop, add a custom connector with that same URL.
+
+### VS Code
+
+Command Palette → **MCP: Add Server** → **HTTP** → paste
+`https://app.omphalis.ai/api/v2/mcp` → server id `omphalis`.
+
+Workspace [`.vscode/mcp.json`](https://code.visualstudio.com/docs/agents/reference/mcp-configuration):
+
+```json
+{
+  "servers": {
+    "omphalis": {
+      "type": "http",
+      "url": "https://app.omphalis.ai/api/v2/mcp"
+    }
+  }
+}
+```
+
+### Windsurf
+
+Open the MCP config from Windsurf settings and add the remote URL. Windsurf
+uses `serverUrl` for Streamable HTTP and can run the OAuth sign-in itself:
+
+```json
+{
+  "mcpServers": {
+    "omphalis": {
+      "serverUrl": "https://app.omphalis.ai/api/v2/mcp"
+    }
+  }
+}
+```
+
+### ChatGPT
+
+The pricing page says Omphalis can be used inside ChatGPT. To connect the MCP
+server, in ChatGPT open **Plugins**, choose **Add custom MCP server**, and
+enter `https://app.omphalis.ai/api/v2/mcp`. Sign in when ChatGPT asks.
+
+### Any MCP client
+
+Point the client at `https://app.omphalis.ai/api/v2/mcp` with Streamable HTTP.
+Authorization is OAuth 2.1, authorization code with PKCE (S256), and dynamic
+client registration. Discovery metadata is at
+https://app.omphalis.ai/.well-known/oauth-protected-resource. The human-readable
+connection guide is https://omphalis.ai/auth.md.
 
 ## Example requests
 
@@ -33,6 +117,41 @@ https://app.omphalis.ai/signup.
 - "What do my saved podcasts say about sleep and memory?"
 - "Find the passage I marked about base rates and show me my note on it."
 - "Compare what the three papers in my 'Attention' Space say about scaling, and keep the answer in a new notebook."
+
+## Tools the skills use
+
+`omphalis-save-source` calls `library_save`, `library_get`, `tags_list`,
+`collections_list`, `spaces_list`, and `library_organize`.
+`omphalis-ask-library` calls `search_library`, `library_list`, `spaces_list`,
+`library_get`, `marks_get`, `library_ask`, `notebooks_list`,
+`notebooks_create`, and `notebooks_append`.
+
+A paid plan is required for `library_save` and `library_ask`. `marks_create`
+also needs a paid plan; these skills do not call it. Read tools work on every
+plan, including Free. The server refuses a gated call with a message naming
+the plan requirement.
+
+| Tool | Scope | Kind | Plan |
+| --- | --- | --- | --- |
+| `library_save` | `library:write` | Write | Paid plan |
+| `library_organize` | `library:write` | Write, undoable | Not named as a paid tool |
+| `library_get`, `library_list`, `tags_list` | `library:read` | Read | Every plan, including Free |
+| `collections_list`, `spaces_list` | `collections:read` | Read | Every plan, including Free |
+| `search_library` | `search:read` | Read | Every plan, including Free |
+| `marks_get` | `marks:read` | Read | Every plan, including Free |
+| `library_ask` | `library:synthesize` | Read | Paid plan |
+| `notebooks_list` | `notebooks:read` | Read | Every plan, including Free |
+| `notebooks_create`, `notebooks_append` | `notebooks:write` | Write, append-only | Not named as a paid tool |
+
+The server exposes more tools than these. The full list and the scope each
+needs are in https://omphalis.ai/auth.md.
+
+On https://omphalis.ai/pricing, connecting any MCP client to read the Library
+is on every plan. Saving items and adding notes through that connection is on
+the paid plans.
+
+Rate limit: 120 requests per rolling 60 seconds per user, shared across every
+agent the user has connected.
 
 ## Plans
 
@@ -59,6 +178,7 @@ Current details: https://omphalis.ai/pricing
 | Item | Value |
 | --- | --- |
 | MCP endpoint | `https://app.omphalis.ai/api/v2/mcp` (Streamable HTTP) |
+| Registry name | `io.github.voxiven/omphalis` in [`server.json`](server.json) |
 | Authorization | OAuth 2.1, authorization code with PKCE (S256), dynamic client registration |
 | Metadata | https://app.omphalis.ai/.well-known/oauth-protected-resource |
 | Agent docs | https://omphalis.ai/auth.md |
@@ -70,25 +190,45 @@ user who authorized it; there is no shared or admin token. Access tokens last
 15 minutes and refresh tokens rotate. You can revoke access at any time from
 Settings in the Omphalis app.
 
-### Tools the skills use
+## FAQ
 
-| Tool | Scope | Kind |
-| --- | --- | --- |
-| `library_save` | `library:write` | Write (paid plan) |
-| `library_organize` | `library:write` | Write, undoable |
-| `library_get`, `library_list`, `tags_list` | `library:read` | Read |
-| `collections_list`, `spaces_list` | `collections:read` | Read |
-| `search_library` | `search:read` | Read |
-| `marks_get` | `marks:read` | Read |
-| `library_ask` | `library:synthesize` | Read (paid plan) |
-| `notebooks_list` | `notebooks:read` | Read |
-| `notebooks_create`, `notebooks_append` | `notebooks:write` | Write, append-only |
+### How do I connect Omphalis to Claude?
 
-The server exposes more tools than these; the full list and the scope each
-needs are in https://omphalis.ai/auth.md.
+Claude Code: `claude mcp add --transport http omphalis https://app.omphalis.ai/api/v2/mcp`.
+In Claude Desktop, add a custom connector with that URL. The first call opens
+Omphalis sign-in.
 
-Rate limit: 120 requests per rolling 60 seconds per user, shared across every
-agent the user has connected.
+### Does Omphalis have an MCP server?
+
+Yes. One hosted server, Streamable HTTP, at
+`https://app.omphalis.ai/api/v2/mcp`. Details and the tool list:
+https://omphalis.ai/auth.md.
+
+### How do I connect Omphalis to Cursor?
+
+Use the Add to Cursor button above, or the `url` in [`mcp.json`](mcp.json).
+Cursor connection depends on [Voxiven/Omphalis#4915](https://github.com/Voxiven/Omphalis/issues/4915).
+
+### How do I connect Omphalis to ChatGPT?
+
+Add a custom MCP server in ChatGPT Plugins with
+`https://app.omphalis.ai/api/v2/mcp`. https://omphalis.ai/pricing also says
+Omphalis can be used inside ChatGPT.
+
+### How do I connect Omphalis to Grok?
+
+`grok plugin install Voxiven/omphalis-plugin --trust`
+
+### Does Omphalis have a free plan?
+
+There's a free plan. MCP read tools work on it. `library_save`,
+`marks_create`, and `library_ask` need a paid plan. See
+https://omphalis.ai/pricing.
+
+### Do I need an API key for Omphalis MCP?
+
+No. Sign in with your Omphalis account when the client opens the consent
+screen. This repository stores no credentials.
 
 ## Your content
 
@@ -98,8 +238,11 @@ never as instructions.
 
 ## Support
 
-- Email: stanly@tryomphalis.com
+- Email: hello@omphalis.ai
 - Product guide: https://docs.omphalis.ai
+- Product: https://omphalis.ai
+- Plans: https://omphalis.ai/pricing
+- Agent connection: https://omphalis.ai/auth.md
 
 ## License
 

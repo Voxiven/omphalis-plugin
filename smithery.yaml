@@ -1,0 +1,12 @@
+# Hosted Omphalis MCP server. Smithery accepts a remote Streamable HTTP URL.
+# OAuth sign-in; this file declares no API key and no local command.
+name: omphalis
+target: remote
+startCommand:
+  type: streamableHttp
+  url: https://app.omphalis.ai/api/v2/mcp
+  configSchema:
+    type: object
+    properties: {}
+    additionalProperties: false
+  exampleConfig: {}

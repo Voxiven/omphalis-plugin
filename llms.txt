@@ -1,0 +1,19 @@
+# Omphalis
+
+> Omphalis MCP server and plugin: connect your Omphalis Library to Grok, Cursor, Claude, ChatGPT and any MCP client.
+
+Omphalis is a workspace for understanding articles, PDFs, videos and podcasts. This repository is the plugin and MCP client configuration. The server is hosted at `https://app.omphalis.ai/api/v2/mcp` (Streamable HTTP). Sign-in is OAuth 2.1 with PKCE. There is no API key in this repository.
+
+There's a free plan. Read tools work on every plan. The MCP tools `library_save`, `marks_create`, and `library_ask` need a paid plan. Current plan details are on the pricing page.
+
+## Links
+
+- [Omphalis](https://omphalis.ai): product site
+- [Pricing](https://omphalis.ai/pricing): plans
+- [Connecting an agent](https://omphalis.ai/auth.md): endpoint, OAuth, scopes, and the tool list
+- [Plugin repository](https://github.com/Voxiven/omphalis-plugin): install instructions and skills
+- [Product guide](https://docs.omphalis.ai)
+
+## Contact
+
+hello@omphalis.ai
