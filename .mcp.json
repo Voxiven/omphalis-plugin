@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "omphalis": {
+      "type": "http",
+      "url": "https://app.omphalis.ai/api/v2/mcp"
+    }
+  }
+}

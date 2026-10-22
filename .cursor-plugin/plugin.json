@@ -1,0 +1,14 @@
+{
+  "name": "omphalis",
+  "version": "1.0.0",
+  "description": "Omphalis is a workspace for understanding articles, PDFs, videos and podcasts. Connect your Omphalis Library over the hosted Omphalis MCP server (OAuth sign-in, no API key) to save a source, search what you kept, and ask questions answered from your own saved sources with citations back to them.",
+  "author": {
+    "name": "Voxiven LLC",
+    "email": "stanly@tryomphalis.com"
+  },
+  "homepage": "https://omphalis.ai",
+  "repository": "https://github.com/Voxiven/omphalis-plugin",
+  "license": "MIT",
+  "keywords": ["omphalis", "omphalis library", "omphalis mcp", "omphalis ask", "omphalis notebook"],
+  "logo": "assets/logo.svg"
+}

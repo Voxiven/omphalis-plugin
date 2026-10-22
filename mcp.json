@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "omphalis": {
+      "url": "https://app.omphalis.ai/api/v2/mcp"
+    }
+  }
+}
